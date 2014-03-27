@@ -1,6 +1,5 @@
 #!/bin/sh
 
-mkdir build-dir
-pushd build-dir
-cmake .. && make && cp 010cc ..
+pushd 010cc
+./build
 popd

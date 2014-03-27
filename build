@@ -3,3 +3,7 @@
 pushd 010cc
 ./build
 popd
+
+pushd nauty
+./configure && make
+popd

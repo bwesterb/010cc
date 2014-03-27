@@ -210,7 +210,7 @@ int main()
 {
     std::string line;
     while (std::getline(std::cin, line)) {
-        graph<20> graph(line);
+        graph<21> graph(line);
         if(!graph.find_010coloring())
             std::cout << line << std::endl;
     }

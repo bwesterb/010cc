@@ -41,7 +41,6 @@ class Server(object):
                                 or not isinstance(msg[2], int)):
                     s.send_json(['error', 'malformed request'])
                     continue
-                print 'ping '
                 worker_id = msg[1]
                 task = msg[2]
                 self.db.set('worker-{}'.format(worker_id),

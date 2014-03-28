@@ -13,8 +13,9 @@ class Client(object):
                 if self.task == -1:
                     continue
                 task = self.task
-            print 'working on task {}'.format(task)
-            self.result = subprocess.check_output(['./run-batch', str(task)])
+            print 'working on task %s' % task
+            self.result = subprocess.Popen(['./run-batch', str(task)],
+                                stdout=subprocess.PIPE).communicate()[0]
             print '     done!'
             with self.cond:
                 self.cond.notify()

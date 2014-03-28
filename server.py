@@ -1,4 +1,6 @@
 import zmq
+import time
+import json
 import os.path
 import kyotocabinet
 
@@ -9,13 +11,20 @@ class Server(object):
         self.workers = {}
     def open_db(self):
         path = 'db.kch'
+        self.db = kyotocabinet.DB()
         if os.path.exists(path):
-            self.db = kyotocabinet.db.open(path, kyotocabinet.DB.OWRITER)
+            print 'Opening db ...'
+            if not self.db.open(path, kyotocabinet.DB.OWRITER):
+                raise RuntimeError
+            print '    done'
             return
-        self.db = kyotocabinet.db.open(path, kyotocabinet.DB.OWRITER |
-                                             kyotocabinet.DB.OCREATE)
+        print 'Creating db ...'
+        if not self.db.open(path, kyotocabinet.DB.OWRITER |
+                                  kyotocabinet.DB.OCREATE):
+            raise RuntimeError
         for i in xrange(BITS):
             self.db.set('todo-{}'.format(i), None)
+        print '     done'
 
     def main(self):
         self.open_db()
@@ -28,11 +37,51 @@ class Server(object):
                 s.send_json(['error', 'malformed request'])
                 continue
             if msg[0] == 'ping':
+                if (not len(msg) == 3 or not isinstance(msg[1], str)
+                                or not isinstance(msg[2], int)):
+                    s.send_json(['error', 'malformed request'])
+                    continue
+                print 'ping '
+                worker_id = msg[1]
+                task = msg[2]
+                self.db.set('worker-{}'.format(worker_id),
+                            json.dumps([task, time.time()]))
                 s.send_json(['pong'])
                 continue
+            if msg[0] == 'request':
+                if (not len(msg) == 2 or not isinstance(msg[1], str)):
+                    s.send_json(['error', 'malformed request'])
+                    continue
+                worker_id = msg[1]
+                keys = self.db.match_prefix('todo-', 1)
+                if not keys:
+                    s.send_json(['none'])
+                    continue
+                key = keys[0]
+                self.db.remove(key)
+                task = int(key.split('-')[1])
+                self.db.set('working-{}'.format(task), worker_id)
+                s.send_json(['task', task])
+                continue
+            if msg[0] == 'result':
+                if (not len(msg) == 5 or not isinstance(msg[1], str)
+                                       or not isinstance(msg[2], int)
+                                       or not isinstance(msg[3], str)
+                                       or not isinstance(msg[4], float)):
+                    s.send_json(['error', 'malformed request'])
+                    continue
+                worker_id = msg[1]
+                task = msg[2]
+                result = msg[3]
+                duration = msg[4]
+                self.db.remove('working-{}'.format(task))
+                self.db.set('result-{}'.format(task), 
+                            json.dumps([result, worker_id, duration]))
+                s.send_json(['ok'])
+                print 'result for {} from {} in {}'.format(task, worker_id,
+                                        duration)
+                continue
             s.send_json(['error', 'unknown message'])
-
-
 
 if __name__ == '__main__':
     Server().main()

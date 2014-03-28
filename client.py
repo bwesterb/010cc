@@ -56,7 +56,7 @@ class Client(object):
                     self.task = msg[1]
                     self.start_time = time.time()
                     self.cond.notify()
-                self.cond.wait(1)
+                self.cond.wait(10)
 
 if __name__ == '__main__':
     Client().main()

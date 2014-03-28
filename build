@@ -1,9 +1,10 @@
 #!/bin/bash
 
 pushd 010cc
-./build
+./build || exit 1
 popd
 
 pushd nauty
-./configure && make
+./configure || exit 1
+make geng || exit 1
 popd

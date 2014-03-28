@@ -31,7 +31,7 @@ class Client(object):
         self.worker.start()
         zctx = zmq.Context()
         s = zctx.socket(zmq.REQ)
-        s.connect('tcp://localhost:5555')
+        s.connect('tcp://sw.w-nz.com:5555')
         while True:
             s.send_json(['ping', identifier, self.task])
             s.recv_json()
@@ -56,7 +56,7 @@ class Client(object):
                     self.task = msg[1]
                     self.start_time = time.time()
                     self.cond.notify()
-                self.cond.wait(1)
+                self.cond.wait(60)
 
 if __name__ == '__main__':
     Client().main()

@@ -6,8 +6,7 @@
 #include <stack>
 #include <stdexcept>
 #include <cassert>
-
-#include <boost/format.hpp>
+#include <vector>
 
 typedef uint8_t node_t;
 typedef std::array<node_t, 3> triangle_t;
@@ -47,9 +46,7 @@ public:
             throw std::runtime_error("graph6 should not be empty");
         unsigned int runtime_N =  graph6[0] - 63;
         if(runtime_N != N)
-            throw std::runtime_error(
-                    (boost::format("graph size unsupported: %1% ")
-                            % runtime_N).str());
+            throw std::runtime_error("graph size unsupported");
 
         // Now, load the adjacency matrix and neighbourhood lists
         int x = 0, y = 1;

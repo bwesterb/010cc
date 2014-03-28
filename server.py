@@ -65,7 +65,7 @@ class Server(object):
             if msg[0] == 'result':
                 if (not len(msg) == 5 or not isinstance(msg[1], str)
                                        or not isinstance(msg[2], int)
-                                       or not isinstance(msg[3], str)
+                                       or not isinstance(msg[3], basestring)
                                        or not isinstance(msg[4], float)):
                     s.send_json(['error', 'malformed request'])
                     continue

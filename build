@@ -8,3 +8,8 @@ pushd nauty
 ./configure || exit 1
 make geng || exit 1
 popd
+
+pushd pyzmq
+python setup.py build --zmq=bundled || exit 1
+python setup.py install --install-lib .. || exit 1
+popd

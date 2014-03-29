@@ -4,6 +4,7 @@ import time
 import random
 import threading
 import subprocess
+import multiprocessing
 
 class Client(object):
     def worker(self):
@@ -59,5 +60,10 @@ class Client(object):
                     self.cond.notify()
                 self.cond.wait(60)
 
-if __name__ == '__main__':
+def main():
     Client().main()
+
+if __name__ == '__main__':
+    for i in xrange(multiprocessing.cpu_count()):
+        print 'starting worker', i
+        threading.Thread(target=main).start()

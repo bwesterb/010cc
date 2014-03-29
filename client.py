@@ -15,7 +15,7 @@ class Client(object):
                 task = self.task
             print 'working on task %s' % task
             self.result = subprocess.Popen(['./run-batch', str(task)],
-                                stdout=subprocess.PIPE).communicate()[0]
+                                stdout=subprocess.PIPE).communicate()
             print '     done!'
             with self.cond:
                 self.cond.notify()
@@ -40,7 +40,7 @@ class Client(object):
                 if self.result is not None:
                     while True:
                         s.send_json(['result', identifier, self.task,
-                                                    self.result,
+                                                    json.dumps(self.result),
                                             time.time() - self.start_time])
                         msg = s.recv_json()
                         if msg[0] == 'ok':

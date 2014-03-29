@@ -28,11 +28,15 @@ class Server(object):
 
     def main(self):
         self.open_db()
+        self.last_sync = 0
         zctx = zmq.Context()
         s = zctx.socket(zmq.REP)
         s.bind('tcp://*:5555')
         while True:
             msg = s.recv_json()
+            if time.time() - self.last_sync > 100:
+                self.last_sync = time.time()
+                self.db.synchronize()
             if not isinstance(msg, list) or not msg:
                 s.send_json(['error', 'malformed request'])
                 continue

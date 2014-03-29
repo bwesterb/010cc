@@ -31,7 +31,7 @@ class Server(object):
         self.last_sync = 0
         zctx = zmq.Context()
         s = zctx.socket(zmq.REP)
-        s.bind('tcp://*:5557')
+        s.bind('tcp://*:5558')
         while True:
             msg = s.recv_json()
             if time.time() - self.last_sync > 100:

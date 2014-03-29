@@ -16,7 +16,8 @@ class Client(object):
                 task = self.task
             print 'working on task %s' % task
             self.result = subprocess.Popen(['./run-batch', str(task)],
-                                stdout=subprocess.PIPE).communicate()
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE).communicate()
             print '     done!'
             with self.cond:
                 self.cond.notify()
@@ -33,7 +34,7 @@ class Client(object):
         self.worker.start()
         zctx = zmq.Context()
         s = zctx.socket(zmq.REQ)
-        s.connect('tcp://sw.w-nz.com:5556')
+        s.connect('tcp://sw.w-nz.com:5557')
         while True:
             s.send_json(['ping', identifier, self.task])
             s.recv_json()

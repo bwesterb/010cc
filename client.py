@@ -32,7 +32,7 @@ class Client(object):
         self.worker.start()
         zctx = zmq.Context()
         s = zctx.socket(zmq.REQ)
-        s.connect('tcp://sw.w-nz.com:5555')
+        s.connect('tcp://sw.w-nz.com:5556')
         while True:
             s.send_json(['ping', identifier, self.task])
             s.recv_json()

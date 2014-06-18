@@ -66,6 +66,10 @@ def main():
     Client().main()
 
 if __name__ == '__main__':
-    for i in xrange(multiprocessing.cpu_count()):
+    if len(sys.argv) > 2:
+        cpu_count = int(sys.argv[2])
+    else:
+        cpu_count = multiprocessing.cpu_count()
+    for i in xrange(cpu_count):
         print 'starting worker', i
         threading.Thread(target=main).start()

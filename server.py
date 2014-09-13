@@ -16,6 +16,21 @@ class Server(object):
             print 'Opening db ...'
             if not self.db.open(path, kyotocabinet.DB.OWRITER):
                 raise RuntimeError
+            n_replaced = 0
+            for key in self.db.match_prefix('result-'):
+                data = json.loads(self.db.get(key))
+                result = json.loads(data[0])
+                if not 'graphs generated' in result[1]:
+                    n_replaced += 1
+                    self.db.set(key.replace('result-', 'todo-'), None)
+                    self.db.remove(key)
+            for key in self.db.match_prefix('working-'):
+                if time.time() - json.loads(self.db.get(
+                        'worker-'+self.db.get(key)))[1] > 200:
+                    n_replaced += 1
+                    self.db.set(key.replace('working-', 'todo-'), None)
+                    self.db.remove(key)
+            print '  reset {} results'.format(n_replaced)
             print '    done'
             return
         print 'Creating db ...'
